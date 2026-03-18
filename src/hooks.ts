@@ -9,6 +9,10 @@ import { resetState as resetHeartbeatState } from "./modules/heartbeat";
 import { initLocale, getString } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
+import {
+  registerReaderEventListeners,
+  unregisterReaderEventListeners,
+} from "./modules/reader-events";
 
 async function onStartup() {
   ztoolkit.log("onStartup() begin — waiting for Zotero promises...");
@@ -27,6 +31,9 @@ async function onStartup() {
 
   registerActivityListener();
   ztoolkit.log("onStartup() activity listener registered");
+
+  registerReaderEventListeners();
+  ztoolkit.log("onStartup() reader event listeners registered");
 
   await Promise.all(
     Zotero.getMainWindows().map((win) => onMainWindowLoad(win)),
@@ -84,6 +91,7 @@ async function onMainWindowUnload(_win: Window): Promise<void> {
 function onShutdown(): void {
   ztoolkit.log("onShutdown() begin");
   ztoolkit.unregisterAll();
+  unregisterReaderEventListeners();
   unregisterActivityListener();
   resetHeartbeatState();
   addon.data.alive = false;

@@ -77,10 +77,12 @@ async function sendHeartbeat(data: HeartbeatData): Promise<void> {
   const args = buildCliArgs(data);
   Zotero.debug(`[zotero-wakatime] sendHeartbeat: CLI args = ${JSON.stringify(args)}`);
 
+  // Update state immediately to prevent concurrent calls from passing the rate limit check
+  lastHeartbeatTime = Date.now();
+  lastHeartbeatEntity = data.entity;
+
   try {
     const result = await runCli(args);
-    lastHeartbeatTime = Date.now();
-    lastHeartbeatEntity = data.entity;
     Zotero.debug(`[zotero-wakatime] sendHeartbeat: SUCCESS exit=${result.exitCode}`);
     ztoolkit.log(`Heartbeat sent: ${data.entity} (exit: ${result.exitCode})`);
   } catch (e) {

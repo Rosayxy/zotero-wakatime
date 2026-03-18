@@ -90,10 +90,10 @@ async function handleTabSelect(
     await sendHeartbeat({
       entity: title || `item-${parentItem.id}`,
       entityType: "app",
-      category: "reading",
+      category: "researching",
       project: collection,
       isWrite: false,
-      language: getItemLanguage(item),
+      // language: getItemLanguage(item),
     });
   }
 }
@@ -193,4 +193,10 @@ function getItemLanguage(item: Zotero.Item): string | undefined {
   return undefined;
 }
 
-export { registerActivityListener, unregisterActivityListener, handleNotify };
+export {
+  registerActivityListener,
+  unregisterActivityListener,
+  handleNotify,
+  getItemCollectionName,
+  // getItemLanguage,
+};
