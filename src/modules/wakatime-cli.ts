@@ -2,6 +2,10 @@
  * WakaTime CLI binary management — locate and execute wakatime-cli.
  */
 
+const { Subprocess } = ChromeUtils.importESModule(
+  "resource://gre/modules/Subprocess.sys.mjs",
+);
+
 function getCliPath(): string {
   const homeDir = Services.dirsvc.get("Home", Ci.nsIFile).path;
 
@@ -43,71 +47,36 @@ async function cliExists(): Promise<boolean> {
   }
 }
 
-function runCli(args: string[]): Promise<{ exitCode: number }> {
-  return new Promise((resolve, reject) => {
-    try {
-      const cliPath = getCliPath();
-      Zotero.debug(`[zotero-wakatime] runCli: path=${cliPath} args=${JSON.stringify(args)}`);
-      const file = Cc["@mozilla.org/file/local;1"].createInstance(
-        Ci.nsIFile,
-      );
-      file.initWithPath(cliPath);
+async function runCli(args: string[]): Promise<{ exitCode: number }> {
+  const cliPath = getCliPath();
+  Zotero.debug(
+    `[zotero-wakatime] runCli: path=${cliPath} args=${JSON.stringify(args)}`,
+  );
 
-      if (!file.exists()) {
-        Zotero.debug(`[zotero-wakatime] runCli: CLI not found at ${cliPath}`);
-        reject(new Error(`wakatime-cli not found at ${cliPath}`));
-        return;
-      }
+  try {
+    const proc = await Subprocess.call({
+      command: cliPath,
+      arguments: args,
+    });
 
-      const process = Cc["@mozilla.org/process/util;1"].createInstance(
-        Ci.nsIProcess,
-      );
-      process.init(file);
-
-      const observer = {
-        observe(_subject: any, topic: string, _data: string) {
-          Zotero.debug(`[zotero-wakatime] runCli: observer topic=${topic} exitValue=${process.exitValue}`);
-          if (topic === "process-finished") {
-            resolve({ exitCode: process.exitValue });
-          } else if (topic === "process-failed") {
-            reject(new Error("wakatime-cli process failed"));
-          }
-        },
-      };
-
-      process.runAsync(args, args.length, observer);
-      Zotero.debug("[zotero-wakatime] runCli: runAsync called");
-    } catch (e) {
-      Zotero.debug(`[zotero-wakatime] runCli: EXCEPTION ${e}`);
-      reject(e);
-    }
-  });
+    Zotero.debug("[zotero-wakatime] runCli: process started");
+    const { exitCode } = await proc.wait();
+    Zotero.debug(
+      `[zotero-wakatime] runCli: process finished, exitCode=${exitCode}`,
+    );
+    return { exitCode };
+  } catch (e) {
+    Zotero.debug(`[zotero-wakatime] runCli: EXCEPTION ${e}`);
+    throw e;
+  }
 }
 
 async function getCliVersion(): Promise<string> {
-  const cliPath = getCliPath();
-  const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-  file.initWithPath(cliPath);
-
-  if (!file.exists()) {
-    throw new Error(`wakatime-cli not found at ${cliPath}`);
-  }
-
-  const process = Cc["@mozilla.org/process/util;1"].createInstance(
-    Ci.nsIProcess,
-  );
-  process.init(file);
-
-  // Run synchronously to capture version output
-  process.run(true, ["--version"], 1);
-
-  // wakatime-cli --version returns exit code 0 on success
-  // The actual version string is printed to stdout, but nsIProcess
-  // doesn't capture stdout. Return a confirmation instead.
-  if (process.exitValue === 0) {
+  const result = await runCli(["--version"]);
+  if (result.exitCode === 0) {
     return "installed";
   }
-  throw new Error(`wakatime-cli exited with code ${process.exitValue}`);
+  throw new Error(`wakatime-cli exited with code ${result.exitCode}`);
 }
 
 export { getCliPath, cliExists, runCli, getCliVersion };
