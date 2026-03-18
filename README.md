@@ -117,4 +117,4 @@ Please open an issue at <https://github.com/Rosayxy/zotero-wakatime/issues> and 
 
 ## License
 
-[MIT](LICENSE)
+[GNU Affero General Public License v3.0](LICENSE)
