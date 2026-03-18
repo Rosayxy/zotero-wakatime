@@ -1,131 +1,61 @@
 import { config } from "../../package.json";
-import { getString } from "../utils/locale";
+import { getApiKey, setApiKey } from "./config-file";
+import { cliExists, getCliVersion } from "./wakatime-cli";
 
 export async function registerPrefsScripts(_window: Window) {
-  // This function is called when the prefs window is opened
-  // See addon/content/preferences.xhtml onpaneload
   if (!addon.data.prefs) {
-    addon.data.prefs = {
-      window: _window,
-      columns: [
-        {
-          dataKey: "title",
-          label: getString("prefs-table-title"),
-          fixedWidth: true,
-          width: 100,
-        },
-        {
-          dataKey: "detail",
-          label: getString("prefs-table-detail"),
-        },
-      ],
-      rows: [
-        {
-          title: "Orange",
-          detail: "It's juicy",
-        },
-        {
-          title: "Banana",
-          detail: "It's sweet",
-        },
-        {
-          title: "Apple",
-          detail: "I mean the fruit APPLE",
-        },
-      ],
-    };
+    addon.data.prefs = { window: _window };
   } else {
     addon.data.prefs.window = _window;
   }
-  updatePrefsUI();
+  await updatePrefsUI();
   bindPrefEvents();
 }
 
 async function updatePrefsUI() {
-  // You can initialize some UI elements on prefs window
-  // with addon.data.prefs.window.document
-  // Or bind some events to the elements
-  const renderLock = ztoolkit.getGlobal("Zotero").Promise.defer();
-  if (addon.data.prefs?.window == undefined) return;
-  const tableHelper = new ztoolkit.VirtualizedTable(addon.data.prefs?.window)
-    .setContainerId(`${config.addonRef}-table-container`)
-    .setProp({
-      id: `${config.addonRef}-prefs-table`,
-      // Do not use setLocale, as it modifies the Zotero.Intl.strings
-      // Set locales directly to columns
-      columns: addon.data.prefs?.columns,
-      showHeader: true,
-      multiSelect: true,
-      staticColumns: true,
-      disableFontSizeScaling: true,
-    })
-    .setProp("getRowCount", () => addon.data.prefs?.rows.length || 0)
-    .setProp(
-      "getRowData",
-      (index) =>
-        addon.data.prefs?.rows[index] || {
-          title: "no data",
-          detail: "no data",
-        },
-    )
-    // Show a progress window when selection changes
-    .setProp("onSelectionChange", (selection) => {
-      new ztoolkit.ProgressWindow(config.addonName)
-        .createLine({
-          text: `Selected line: ${addon.data.prefs?.rows
-            .filter((v, i) => selection.isSelected(i))
-            .map((row) => row.title)
-            .join(",")}`,
-          progress: 100,
-        })
-        .show();
-    })
-    // When pressing delete, delete selected line and refresh table.
-    // Returning false to prevent default event.
-    .setProp("onKeyDown", (event: KeyboardEvent) => {
-      if (event.key == "Delete" || (Zotero.isMac && event.key == "Backspace")) {
-        addon.data.prefs!.rows =
-          addon.data.prefs?.rows.filter(
-            (v, i) => !tableHelper.treeInstance.selection.isSelected(i),
-          ) || [];
-        tableHelper.render();
-        return false;
+  const win = addon.data.prefs?.window;
+  if (!win) return;
+
+  // Load API key from config file into the preference input
+  const apiKey = await getApiKey();
+  const apiKeyInput = win.document.querySelector(
+    `#zotero-prefpane-${config.addonRef}-apikey`,
+  ) as HTMLInputElement;
+  if (apiKeyInput && apiKey) {
+    apiKeyInput.value = apiKey;
+  }
+
+  // Show CLI status
+  const statusLabel = win.document.querySelector(
+    `#zotero-prefpane-${config.addonRef}-status`,
+  ) as HTMLElement;
+  if (statusLabel) {
+    const hasCli = await cliExists();
+    if (hasCli) {
+      try {
+        const version = await getCliVersion();
+        statusLabel.textContent = `wakatime-cli: ${version}`;
+      } catch {
+        statusLabel.textContent = "wakatime-cli: found (version unknown)";
       }
-      return true;
-    })
-    // For find-as-you-type
-    .setProp(
-      "getRowString",
-      (index) => addon.data.prefs?.rows[index].title || "",
-    )
-    // Render the table.
-    .render(-1, () => {
-      renderLock.resolve();
-    });
-  await renderLock.promise;
-  ztoolkit.log("Preference table rendered!");
+    } else {
+      statusLabel.textContent =
+        "wakatime-cli: NOT FOUND — install from https://wakatime.com/";
+    }
+  }
 }
 
 function bindPrefEvents() {
-  addon.data
-    .prefs!.window.document?.querySelector(
-      `#zotero-prefpane-${config.addonRef}-enable`,
-    )
-    ?.addEventListener("command", (e: Event) => {
-      ztoolkit.log(e);
-      addon.data.prefs!.window.alert(
-        `Successfully changed to ${(e.target as XUL.Checkbox).checked}!`,
-      );
-    });
+  const win = addon.data.prefs?.window;
+  if (!win) return;
 
-  addon.data
-    .prefs!.window.document?.querySelector(
-      `#zotero-prefpane-${config.addonRef}-input`,
-    )
-    ?.addEventListener("change", (e: Event) => {
-      ztoolkit.log(e);
-      addon.data.prefs!.window.alert(
-        `Successfully changed to ${(e.target as HTMLInputElement).value}!`,
-      );
+  // When API key changes, write to ~/.wakatime.cfg
+  win.document
+    .querySelector(`#zotero-prefpane-${config.addonRef}-apikey`)
+    ?.addEventListener("change", async (e: Event) => {
+      const value = (e.target as HTMLInputElement).value;
+      if (value) {
+        await setApiKey(value.trim());
+      }
     });
 }

@@ -1,5 +1,8 @@
-pref-title = Addon Template Example
+pref-title = WakaTime Settings
 pref-enable =
-    .label = Enable
-pref-input = Input
-pref-help = { $name } Build { $version } { $time }
+    .label = Enable WakaTime time tracking
+pref-apikey = API Key
+pref-category = Default Category
+pref-debug =
+    .label = Enable debug logging
+pref-help = { $name } v{ $version }

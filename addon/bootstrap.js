@@ -7,35 +7,58 @@
 
 var chromeHandle;
 
-function install(data, reason) {}
+function log(msg) {
+  // dump() is always available in bootstrap context; Zotero.debug() may not be
+  dump("[ZoteroWakaTime] " + msg + "\n");
+  if (typeof Zotero !== "undefined") {
+    Zotero.debug("[ZoteroWakaTime] " + msg);
+  }
+}
+
+function install(data, reason) {
+  log("bootstrap.install() called");
+}
 
 async function startup({ id, version, resourceURI, rootURI }, reason) {
-  var aomStartup = Components.classes[
-    "@mozilla.org/addons/addon-manager-startup;1"
-  ].getService(Components.interfaces.amIAddonManagerStartup);
-  var manifestURI = Services.io.newURI(rootURI + "manifest.json");
-  chromeHandle = aomStartup.registerChrome(manifestURI, [
-    ["content", "__addonRef__", rootURI + "content/"],
-  ]);
+  log("bootstrap.startup() called, id=" + id + ", version=" + version + ", rootURI=" + rootURI);
+  try {
+    var aomStartup = Components.classes[
+      "@mozilla.org/addons/addon-manager-startup;1"
+    ].getService(Components.interfaces.amIAddonManagerStartup);
+    var manifestURI = Services.io.newURI(rootURI + "manifest.json");
+    chromeHandle = aomStartup.registerChrome(manifestURI, [
+      ["content", "__addonRef__", rootURI + "content/"],
+    ]);
+    log("chrome registered OK");
 
-  /**
-   * Global variables for plugin code.
-   * The `_globalThis` is the global root variable of the plugin sandbox environment
-   * and all child variables assigned to it is globally accessible.
-   * See `src/index.ts` for details.
-   */
-  const ctx = { rootURI };
-  ctx._globalThis = ctx;
+    /**
+     * Global variables for plugin code.
+     * The `_globalThis` is the global root variable of the plugin sandbox environment
+     * and all child variables assigned to it is globally accessible.
+     * See `src/index.ts` for details.
+     */
+    const ctx = { rootURI };
+    ctx._globalThis = ctx;
 
-  Services.scriptloader.loadSubScript(
-    `${rootURI}/content/scripts/__addonRef__.js`,
-    ctx,
-  );
-  await Zotero.__addonInstance__.hooks.onStartup();
+    var scriptURI = rootURI + "content/scripts/__addonRef__.js";
+    log("loading script: " + scriptURI);
+    Services.scriptloader.loadSubScript(scriptURI, ctx);
+    log("script loaded OK, Zotero.__addonInstance__ = " + typeof Zotero.__addonInstance__);
+    await Zotero.__addonInstance__.hooks.onStartup();
+    log("onStartup() completed OK");
+  } catch (e) {
+    log("bootstrap.startup() FAILED: " + e);
+  }
 }
 
 async function onMainWindowLoad({ window }, reason) {
-  await Zotero.__addonInstance__?.hooks.onMainWindowLoad(window);
+  log("bootstrap.onMainWindowLoad() called");
+  try {
+    await Zotero.__addonInstance__?.hooks.onMainWindowLoad(window);
+    log("onMainWindowLoad() completed OK");
+  } catch (e) {
+    log("onMainWindowLoad() FAILED: " + e);
+  }
 }
 
 async function onMainWindowUnload({ window }, reason) {
@@ -43,6 +66,7 @@ async function onMainWindowUnload({ window }, reason) {
 }
 
 async function shutdown({ id, version, resourceURI, rootURI }, reason) {
+  log("bootstrap.shutdown() called, reason=" + reason);
   if (reason === APP_SHUTDOWN) {
     return;
   }
@@ -55,4 +79,6 @@ async function shutdown({ id, version, resourceURI, rootURI }, reason) {
   }
 }
 
-async function uninstall(data, reason) {}
+async function uninstall(data, reason) {
+  log("bootstrap.uninstall() called");
+}

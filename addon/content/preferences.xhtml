@@ -10,24 +10,56 @@
     preference="enable"
     data-l10n-id="pref-enable"
   />
-  <hbox>
+  <separator class="thin" />
+  <hbox align="center">
     <html:label
-      for="zotero-prefpane-__addonRef__-input"
-      data-l10n-id="pref-input"
+      for="zotero-prefpane-__addonRef__-apikey"
+      data-l10n-id="pref-apikey"
+      style="margin-right: 8px;"
     ></html:label>
     <html:input
-      type="text"
-      id="zotero-prefpane-__addonRef__-input"
-      preference="input"
+      type="password"
+      id="zotero-prefpane-__addonRef__-apikey"
+      preference="apikey"
+      style="flex: 1;"
     ></html:input>
   </hbox>
-  <hbox class="virtualized-table-container" flex="1" height="300px">
-    <html:div id="__addonRef__-table-container" />
+  <separator class="thin" />
+  <hbox align="center">
+    <html:label
+      for="zotero-prefpane-__addonRef__-category"
+      data-l10n-id="pref-category"
+      style="margin-right: 8px;"
+    ></html:label>
+    <menulist
+      id="zotero-prefpane-__addonRef__-category"
+      preference="category"
+    >
+      <menupopup>
+        <menuitem label="Researching" value="researching" />
+        <menuitem label="Reading" value="reading" />
+        <menuitem label="Learning" value="learning" />
+        <menuitem label="Writing" value="writing" />
+        <menuitem label="Browsing" value="browsing" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <separator class="thin" />
+  <checkbox
+    id="zotero-prefpane-__addonRef__-debug"
+    preference="debug"
+    data-l10n-id="pref-debug"
+  />
+  <separator class="thin" />
+  <hbox>
+    <html:label
+      id="zotero-prefpane-__addonRef__-status"
+    ></html:label>
   </hbox>
 </groupbox>
 <vbox>
   <html:label
     data-l10n-id="pref-help"
-    data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'
+    data-l10n-args='{"name": "__addonName__","version":"__buildVersion__"}'
   ></html:label>
 </vbox>

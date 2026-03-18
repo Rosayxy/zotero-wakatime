@@ -14,3 +14,6 @@ tsconfig.tsbuildinfo
 .scaffold
 build
 logs
+.vscode
+
+CLAUDE.md

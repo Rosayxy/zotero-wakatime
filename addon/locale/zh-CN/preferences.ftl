@@ -1,5 +1,8 @@
-pref-title = 插件模板设置示例
+pref-title = WakaTime 设置
 pref-enable =
-    .label = 开启
-pref-input = 输入
-pref-help = { $name } Build { $version } { $time }
+    .label = 启用 WakaTime 时间追踪
+pref-apikey = API 密钥
+pref-category = 默认分类
+pref-debug =
+    .label = 启用调试日志
+pref-help = { $name } v{ $version }
