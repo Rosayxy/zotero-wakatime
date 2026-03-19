@@ -68,14 +68,18 @@ function buildCliArgs(data: HeartbeatData): string[] {
 }
 
 async function sendHeartbeat(data: HeartbeatData): Promise<void> {
-  Zotero.debug(`[zotero-wakatime] sendHeartbeat: entity="${data.entity}" isWrite=${data.isWrite}`);
+  Zotero.debug(
+    `[zotero-wakatime] sendHeartbeat: entity="${data.entity}" isWrite=${data.isWrite}`,
+  );
   if (!shouldSendHeartbeat(data.entity, data.isWrite)) {
     Zotero.debug("[zotero-wakatime] sendHeartbeat: rate limited, skipping");
     return;
   }
 
   const args = buildCliArgs(data);
-  Zotero.debug(`[zotero-wakatime] sendHeartbeat: CLI args = ${JSON.stringify(args)}`);
+  Zotero.debug(
+    `[zotero-wakatime] sendHeartbeat: CLI args = ${JSON.stringify(args)}`,
+  );
 
   // Update state immediately to prevent concurrent calls from passing the rate limit check
   lastHeartbeatTime = Date.now();
@@ -83,7 +87,9 @@ async function sendHeartbeat(data: HeartbeatData): Promise<void> {
 
   try {
     const result = await runCli(args);
-    Zotero.debug(`[zotero-wakatime] sendHeartbeat: SUCCESS exit=${result.exitCode}`);
+    Zotero.debug(
+      `[zotero-wakatime] sendHeartbeat: SUCCESS exit=${result.exitCode}`,
+    );
     ztoolkit.log(`Heartbeat sent: ${data.entity} (exit: ${result.exitCode})`);
   } catch (e) {
     Zotero.debug(`[zotero-wakatime] sendHeartbeat: FAILED ${e}`);

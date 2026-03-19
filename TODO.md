@@ -12,4 +12,3 @@
   - api key support
   - all types of heartbeat sending
 - testing on ci, for example, using [docker zotero](https://docs.linuxserver.io/images/docker-zotero/#hardware-acceleration-the-move-to-wayland)
-

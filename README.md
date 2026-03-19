@@ -18,10 +18,10 @@ Note: This plugin is in early beta. Please report any issues or feedback when us
 
 ### Platform support
 
-| OS      | Architectures      | Status  |
-| ------- | ------------------ | ------- |
-| Windows | x86-64, arm64      | Supported |
-| macOS   | x86-64, arm64      | Supported |
+| OS      | Architectures      | Status                    |
+| ------- | ------------------ | ------------------------- |
+| Windows | x86-64, arm64      | Supported                 |
+| macOS   | x86-64, arm64      | Supported                 |
 | Linux   | x86-64, arm64, arm | Supported, but not tested |
 
 ## Build and Installation
@@ -79,12 +79,12 @@ The plugin sends a heartbeat to WakaTime whenever you:
 
 Open **Zotero → Settings → WakaTime** to configure:
 
-| Setting                           | Description                                                                                                 |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Enable WakaTime time tracking** | Master on/off switch                                                                                        |
-| **API Key**                       | Your WakaTime secret API key                                                                                |
-| **Default Category**              | WakaTime category reported for each heartbeat (`researching`, `learning`, `writing docs`, `browsing`)       |
-| **Enable debug logging**          | Writes verbose logs to `~/.wakatime/zotero-wakatime.log` and Zotero's debug console                         |
+| Setting                           | Description                                                                                           |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Enable WakaTime time tracking** | Master on/off switch                                                                                  |
+| **API Key**                       | Your WakaTime secret API key                                                                          |
+| **Default Category**              | WakaTime category reported for each heartbeat (`researching`, `learning`, `writing docs`, `browsing`) |
+| **Enable debug logging**          | Writes verbose logs to `~/.wakatime/zotero-wakatime.log` and Zotero's debug console                   |
 
 ## Troubleshooting
 

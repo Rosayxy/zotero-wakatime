@@ -24,9 +24,7 @@ if (!basicTool.getGlobal("Zotero")[config.addonInstance]) {
   Zotero[config.addonInstance] = addon;
   basicTool
     .getGlobal("console")
-    .log(
-      "[ZoteroWakaTime] Addon registered on Zotero." + config.addonInstance,
-    );
+    .log("[ZoteroWakaTime] Addon registered on Zotero." + config.addonInstance);
 } else {
   basicTool
     .getGlobal("console")

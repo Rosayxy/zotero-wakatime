@@ -16,9 +16,13 @@ function registerActivityListener(): void {
       ids: (string | number)[],
       extraData: Record<string, any>,
     ) => {
-      Zotero.debug(`[zotero-wakatime] Notifier.notify RECEIVED: event=${event} type=${type} ids=${JSON.stringify(ids)}`);
+      Zotero.debug(
+        `[zotero-wakatime] Notifier.notify RECEIVED: event=${event} type=${type} ids=${JSON.stringify(ids)}`,
+      );
       if (!addon?.data.alive) {
-        Zotero.debug("[zotero-wakatime] Notifier.notify: addon not alive, unregistering");
+        Zotero.debug(
+          "[zotero-wakatime] Notifier.notify: addon not alive, unregistering",
+        );
         unregisterActivityListener();
         return;
       }
@@ -31,7 +35,9 @@ function registerActivityListener(): void {
     "item",
     "file",
   ]);
-  Zotero.debug(`[zotero-wakatime] registerActivityListener: notifierID=${notifierID}`);
+  Zotero.debug(
+    `[zotero-wakatime] registerActivityListener: notifierID=${notifierID}`,
+  );
 }
 
 function unregisterActivityListener(): void {
@@ -47,7 +53,9 @@ async function handleNotify(
   ids: (string | number)[],
   extraData: Record<string, any>,
 ): Promise<void> {
-  Zotero.debug(`[zotero-wakatime] handleNotify: event=${event} type=${type} ids=${JSON.stringify(ids)}`);
+  Zotero.debug(
+    `[zotero-wakatime] handleNotify: event=${event} type=${type} ids=${JSON.stringify(ids)}`,
+  );
   const enabled = getPref("enable");
   if (!enabled) {
     Zotero.debug("[zotero-wakatime] handleNotify: plugin disabled, skipping");
@@ -66,7 +74,9 @@ async function handleNotify(
     } else if (type === "item" && event === "add") {
       await handleItemModify(ids);
     } else {
-      Zotero.debug(`[zotero-wakatime] handleNotify: unhandled event/type combination`);
+      Zotero.debug(
+        `[zotero-wakatime] handleNotify: unhandled event/type combination`,
+      );
     }
   } catch (e) {
     Zotero.debug(`[zotero-wakatime] handleNotify ERROR: ${e}`);
@@ -157,29 +167,41 @@ async function handleItemSelect(ids: (string | number)[]): Promise<void> {
 }
 
 async function handleItemModify(ids: (string | number)[]): Promise<void> {
-  Zotero.debug(`[zotero-wakatime] handleItemModify: ids=${JSON.stringify(ids)}`);
+  Zotero.debug(
+    `[zotero-wakatime] handleItemModify: ids=${JSON.stringify(ids)}`,
+  );
   for (const id of ids) {
     let item = Zotero.Items.get(id as number);
     if (!item) {
-      Zotero.debug(`[zotero-wakatime] handleItemModify: item ${id} not found, skipping`);
+      Zotero.debug(
+        `[zotero-wakatime] handleItemModify: item ${id} not found, skipping`,
+      );
       continue;
     }
 
-    Zotero.debug(`[zotero-wakatime] handleItemModify: item ${id} type=${item.itemType} isAnnotation=${(item as any).isAnnotation?.()}`);
+    Zotero.debug(
+      `[zotero-wakatime] handleItemModify: item ${id} type=${item.itemType} isAnnotation=${(item as any).isAnnotation?.()}`,
+    );
 
     // Annotations (highlights, notes) are child items — walk up to the parent paper.
     if ((item as any).isAnnotation?.()) {
       const attachment = item.parentItem;
       if (!attachment) {
-        Zotero.debug(`[zotero-wakatime] handleItemModify: annotation ${id} has no parentItem, skipping`);
+        Zotero.debug(
+          `[zotero-wakatime] handleItemModify: annotation ${id} has no parentItem, skipping`,
+        );
         continue;
       }
       item = attachment.parentItem || attachment;
-      Zotero.debug(`[zotero-wakatime] handleItemModify: walked up to item ${item.id} type=${item.itemType}`);
+      Zotero.debug(
+        `[zotero-wakatime] handleItemModify: walked up to item ${item.id} type=${item.itemType}`,
+      );
     }
 
     if (!item.isRegularItem()) {
-      Zotero.debug(`[zotero-wakatime] handleItemModify: item ${item.id} is not regular item, skipping`);
+      Zotero.debug(
+        `[zotero-wakatime] handleItemModify: item ${item.id} is not regular item, skipping`,
+      );
       continue;
     }
 
@@ -187,7 +209,9 @@ async function handleItemModify(ids: (string | number)[]): Promise<void> {
     const collection = getItemCollectionName(item);
     const category = getPref("category") || "researching";
 
-    Zotero.debug(`[zotero-wakatime] handleItemModify: sending heartbeat entity="${title}" project="${collection}" category="${category}"`);
+    Zotero.debug(
+      `[zotero-wakatime] handleItemModify: sending heartbeat entity="${title}" project="${collection}" category="${category}"`,
+    );
 
     await sendHeartbeat({
       entity: title || `item-${item.id}`,
@@ -214,7 +238,6 @@ function getItemCollectionName(item: Zotero.Item): string {
   }
   return "My Library";
 }
-
 
 export {
   registerActivityListener,

@@ -20,7 +20,14 @@ function install(data, reason) {
 }
 
 async function startup({ id, version, resourceURI, rootURI }, reason) {
-  log("bootstrap.startup() called, id=" + id + ", version=" + version + ", rootURI=" + rootURI);
+  log(
+    "bootstrap.startup() called, id=" +
+      id +
+      ", version=" +
+      version +
+      ", rootURI=" +
+      rootURI,
+  );
   try {
     var aomStartup = Components.classes[
       "@mozilla.org/addons/addon-manager-startup;1"
@@ -43,7 +50,10 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
     var scriptURI = rootURI + "content/scripts/__addonRef__.js";
     log("loading script: " + scriptURI);
     Services.scriptloader.loadSubScript(scriptURI, ctx);
-    log("script loaded OK, Zotero.__addonInstance__ = " + typeof Zotero.__addonInstance__);
+    log(
+      "script loaded OK, Zotero.__addonInstance__ = " +
+        typeof Zotero.__addonInstance__,
+    );
     await Zotero.__addonInstance__.hooks.onStartup();
     log("onStartup() completed OK");
   } catch (e) {
