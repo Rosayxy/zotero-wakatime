@@ -55,7 +55,9 @@ async function handleNotify(
   }
 
   try {
-    if (type === "tab" && event === "select") {
+    if (type === "tab" && event === "add") {
+      await handleTabOpen(ids, extraData);
+    } else if (type === "tab" && event === "select") {
       await handleTabSelect(ids, extraData);
     } else if (type === "item" && event === "select") {
       handleItemSelectDebounced(ids);
@@ -72,6 +74,33 @@ async function handleNotify(
   }
 }
 
+async function handleTabOpen(
+  ids: (string | number)[],
+  extraData: Record<string, any>,
+): Promise<void> {
+  const tabId = ids[0];
+  const tabData = extraData[tabId];
+
+  if (tabData?.type !== "reader") return;
+
+  const item = Zotero.Items.get(tabData.itemID as number);
+  if (!item) return;
+
+  const parentItem = item.parentItem || item;
+  const title = parentItem.getField("title") as string;
+  const collection = getItemCollectionName(parentItem);
+
+  const category = getPref("category") || "researching";
+
+  await sendHeartbeat({
+    entity: title || `item-${parentItem.id}`,
+    entityType: "app",
+    category,
+    project: collection,
+    isWrite: false,
+  });
+}
+
 async function handleTabSelect(
   ids: (string | number)[],
   extraData: Record<string, any>,
@@ -86,14 +115,14 @@ async function handleTabSelect(
     const parentItem = item.parentItem || item;
     const title = parentItem.getField("title") as string;
     const collection = getItemCollectionName(parentItem);
+    const category = getPref("category") || "researching";
 
     await sendHeartbeat({
       entity: title || `item-${parentItem.id}`,
       entityType: "app",
-      category: "researching",
+      category,
       project: collection,
       isWrite: false,
-      // language: getItemLanguage(item),
     });
   }
 }
@@ -186,17 +215,10 @@ function getItemCollectionName(item: Zotero.Item): string {
   return "My Library";
 }
 
-function getItemLanguage(item: Zotero.Item): string | undefined {
-  const contentType = (item as any).attachmentContentType;
-  if (contentType === "application/pdf") return "PDF";
-  if (contentType === "application/epub+zip") return "EPUB";
-  return undefined;
-}
 
 export {
   registerActivityListener,
   unregisterActivityListener,
   handleNotify,
   getItemCollectionName,
-  // getItemLanguage,
 };

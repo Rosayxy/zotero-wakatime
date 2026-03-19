@@ -184,10 +184,12 @@ function handleReaderDomEvent(): void {
     `[zotero-wakatime] reader-events: DOM activity, entity="${title}"`,
   );
 
+  const category = getPref("category") || "researching";
+
   sendHeartbeat({
     entity: title || `item-${parentItem.id}`,
     entityType: "app",
-    category: "researching",
+    category,
     project: collection,
     isWrite: false,
   }).catch((e) => {

@@ -4,7 +4,10 @@
 
 √ write proper README.md based on CLAUDE.md, and link it in package.json
 
-- track events like opening a PDF/EPUB
+√ track events like opening a PDF/EPUB
+
+√ supporting manual setting category of WakaTime
+
 - manual testing on linux, and support for macOS if possible (currently only windows is supported)
   - api key support
   - all types of heartbeat sending

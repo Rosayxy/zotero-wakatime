@@ -21,7 +21,7 @@ Note: This plugin is in early beta. Please report any issues or feedback when us
 | OS      | Architectures      | Status  |
 | ------- | ------------------ | ------- |
 | Windows | x86-64, arm64      | Supported |
-| macOS   | x86-64, arm64      | Not Supported (planned) |
+| macOS   | x86-64, arm64      | Supported, but not tested |
 | Linux   | x86-64, arm64, arm | Supported, but not tested |
 
 ## Build and Installation
@@ -69,6 +69,7 @@ On first launch Zotero will prompt you for your WakaTime API key. You can also s
 The plugin sends a heartbeat to WakaTime whenever you:
 
 - **Select a library item** — the item's title becomes the entity; its first collection (or library name) becomes the project.
+- **Open a PDF or EPUB** in the reader — sends a heartbeat immediately on open.
 - **Interact with the PDF/EPUB reader** (click, scroll, keyboard) — throttled to at most one heartbeat every 2 seconds.
 - **Add or annotate an item** (highlight, note, tag, metadata edit) — recorded as a write heartbeat.
 
@@ -80,7 +81,7 @@ Open **Zotero → Settings → WakaTime** to configure:
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Enable WakaTime time tracking** | Master on/off switch                                                                                        |
 | **API Key**                       | Your WakaTime secret API key                                                                                |
-| **Default Category**              | WakaTime category reported for each heartbeat (`researching`, `reading`, `learning`, `writing`, `browsing`) |
+| **Default Category**              | WakaTime category reported for each heartbeat (`researching`, `learning`, `writing docs`, `browsing`)       |
 | **Enable debug logging**          | Writes verbose logs to `~/.wakatime/zotero-wakatime.log` and Zotero's debug console                         |
 
 ## Troubleshooting
