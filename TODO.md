@@ -8,7 +8,7 @@
 
 √ supporting manual setting category of WakaTime
 
-- manual testing on linux, and support for macOS if possible (currently only windows is supported)
+- manual testing on linux. Although macOS, Windows and linux are all supported. Only macOS and Windows are tested.
   - api key support
   - all types of heartbeat sending
 - testing on ci, for example, using [docker zotero](https://docs.linuxserver.io/images/docker-zotero/#hardware-acceleration-the-move-to-wayland)

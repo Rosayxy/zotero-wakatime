@@ -21,7 +21,7 @@ Note: This plugin is in early beta. Please report any issues or feedback when us
 | OS      | Architectures      | Status  |
 | ------- | ------------------ | ------- |
 | Windows | x86-64, arm64      | Supported |
-| macOS   | x86-64, arm64      | Supported, but not tested |
+| macOS   | x86-64, arm64      | Supported |
 | Linux   | x86-64, arm64, arm | Supported, but not tested |
 
 ## Build and Installation
@@ -40,8 +40,10 @@ Note: This plugin is in early beta. Please report any issues or feedback when us
 git clone https://github.com/Rosayxy/zotero-wakatime.git
 cd zotero-wakatime
 npm install
-npm run build          # outputs build/ directory and .xpi file, which is in the .scaffold directory for easy installation
+npm run build
 ```
+
+This produces the zotero-waka-time.xpi file in .scaffold/build/. This is the Add-on package you can install in Zotero.
 
 ## Usage
 
